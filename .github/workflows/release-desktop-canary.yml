@@ -112,6 +112,20 @@ jobs:
               echo "Created canary copy: Superset-Canary-${arch}.AppImage"
             fi
           done
+          for file in *.exe; do
+            if [[ -f "$file" ]]; then
+              cp "$file" "Superset-Canary-x64.exe"
+              echo "Created canary copy: Superset-Canary-x64.exe"
+            fi
+          done
+          for file in *-win.yml; do
+            if [[ -f "$file" && "$file" != "canary-win.yml" && "$file" != "latest-win.yml" ]]; then
+              cp "$file" "canary-win.yml"
+              cp "$file" "latest-win.yml"
+              echo "Created canary manifests: canary-win.yml, latest-win.yml from $file"
+              break
+            fi
+          done
           # Prerelease builds may request canary-linux.yml; keep latest-linux.yml as fallback.
           for file in *-linux.yml; do
             if [[ -f "$file" && "$file" != "canary-linux.yml" && "$file" != "latest-linux.yml" ]]; then
