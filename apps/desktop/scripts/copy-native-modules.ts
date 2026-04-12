@@ -22,6 +22,7 @@ import {
 	readdirSync,
 	readFileSync,
 	realpathSync,
+	rmdirSync,
 	rmSync,
 } from "node:fs";
 import { dirname, join } from "node:path";
@@ -97,8 +98,14 @@ function copyModuleIfSymlink(
 		console.log(`  ${moduleName}: symlink -> replacing with real files`);
 		console.log(`    Real path: ${realPath}`);
 
-		// Remove the symlink
-		rmSync(modulePath);
+		// Remove the symlink/junction.
+		// On Windows, Bun creates NTFS junction points which appear as directories.
+		// rmSync fails on them; rmdirSync removes only the junction entry (not its target).
+		if (process.platform === "win32") {
+			rmdirSync(modulePath);
+		} else {
+			rmSync(modulePath);
+		}
 
 		// Copy the actual files
 		cpSync(realPath, modulePath, { recursive: true });
@@ -203,7 +210,11 @@ function copyDependencyForPackage(
 		const nestedStats = lstatSync(nestedDependencyPath);
 		if (nestedStats.isSymbolicLink()) {
 			const realPath = realpathSync(nestedDependencyPath);
-			rmSync(nestedDependencyPath);
+			if (process.platform === "win32") {
+				rmdirSync(nestedDependencyPath);
+			} else {
+				rmSync(nestedDependencyPath);
+			}
 			cpSync(realPath, nestedDependencyPath, {
 				recursive: true,
 			});
