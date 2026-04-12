@@ -99,6 +99,19 @@ jobs:
               echo "Created stable copy: Superset-${arch}.AppImage"
             fi
           done
+          for file in *.exe; do
+            if [[ -f "$file" ]]; then
+              cp "$file" "Superset-x64.exe"
+              echo "Created stable copy: Superset-x64.exe"
+            fi
+          done
+          for file in *-win.yml; do
+            if [[ -f "$file" && "$file" != "latest-win.yml" ]]; then
+              cp "$file" "latest-win.yml"
+              echo "Created stable copy: latest-win.yml"
+              break
+            fi
+          done
           # Keep Linux updater manifest at a stable filename for generic provider lookups.
           for file in *-linux.yml; do
             if [[ -f "$file" && "$file" != "latest-linux.yml" ]]; then

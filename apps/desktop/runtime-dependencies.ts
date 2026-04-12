@@ -4,6 +4,8 @@ type PackagedNodeModuleCopy = {
 	to: string;
 };
 
+const targetPlatform = process.env.TARGET_PLATFORM ?? process.platform;
+
 type ExternalizedRuntimeModule = {
 	asarUnpackGlobs: string[];
 	materialize: string[];
@@ -45,9 +47,16 @@ const externalizedRuntimeModules: ExternalizedRuntimeModule[] = [
 	},
 	{
 		specifier: "@superset/macos-process-metrics",
-		materialize: ["@superset/macos-process-metrics"],
-		packagedCopies: [copyWholeModule("@superset/macos-process-metrics")],
-		asarUnpackGlobs: ["**/node_modules/@superset/macos-process-metrics/**/*"],
+		materialize:
+			targetPlatform === "darwin" ? ["@superset/macos-process-metrics"] : [],
+		packagedCopies:
+			targetPlatform === "darwin"
+				? [copyWholeModule("@superset/macos-process-metrics")]
+				: [],
+		asarUnpackGlobs:
+			targetPlatform === "darwin"
+				? ["**/node_modules/@superset/macos-process-metrics/**/*"]
+				: [],
 	},
 	{
 		specifier: "@ast-grep/napi",
