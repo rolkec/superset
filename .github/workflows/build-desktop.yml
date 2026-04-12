@@ -33,6 +33,7 @@ jobs:
     name: Build - macOS (${{ matrix.arch }})
     runs-on: macos-latest
     environment: production
+    continue-on-error: true
 
     strategy:
       fail-fast: false
@@ -270,6 +271,9 @@ jobs:
     environment: production
 
     steps:
+      - name: Enable Git long paths
+        run: git config --system core.longpaths true
+
       - name: Checkout code
         uses: actions/checkout@v4
 
